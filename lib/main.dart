@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
-import 'Pantallas/inicio.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import 'providers/prod_provider.dart';
+import 'screens/login_screen.dart';
 
-void main() async { // Inicialización de Firebase
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp( 
-    options: DefaultFirebaseOptions.currentPlatform,
-);
-  runApp(MyApp());
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print("✅ Firebase conectado");
+  } catch (e) {
+    print("❌ Error en Firebase: $e");
+  }
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ProductosProvider()..loadProductos(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,12 +31,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Mi Aplicación',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      ),
-      home: InicioScreen(),
+      title: 'Inventario DAM',
+      theme: ThemeData(useMaterial3: true),
+      debugShowCheckedModeBanner: false,
+      home: LoginScreen(), // Inicia en pantalla de inicio de sesión
     );
   }
 }
